@@ -35,6 +35,20 @@ class TestGetAvailableTasks(unittest.TestCase):
         output = self.captured_output.getvalue()
         self.assertIn("Error: pyproject.toml file not found.", output)
 
+    @patch("builtins.open", new_callable=mock_open, read_data="[package]\n")
+    @patch("tomllib.load")
+    def test_no_tasks_in_file(self, mock_load: MagicMock, mock_file: MagicMock) -> None:
+        mock_load.return_value = {"package": {}}
+        with self.assertRaises(SystemExit) as cm:
+            get_available_tasks()
+        mock_file.assert_called_once_with("pyproject.toml", "rb")
+        self.assertEqual(cm.exception.code, 1)
+        output = self.captured_output.getvalue()
+        self.assertIn(
+            "Error: Tasks not found. Add tasks in pyproject.toml under [tool.tsks].",
+            output,
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

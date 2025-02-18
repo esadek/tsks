@@ -3,11 +3,13 @@ import subprocess
 import sys
 import tomllib
 
+type TasksDict = dict[str, str | list[str]]
 
-def get_available_tasks() -> dict[str, str]:
+
+def get_available_tasks() -> TasksDict:
     try:
         with open("pyproject.toml", "rb") as f:
-            available_tasks: dict[str, str] | None = (
+            available_tasks: TasksDict | None = (
                 tomllib.load(f).get("tool", {}).get("tsks")
             )
     except FileNotFoundError:
@@ -22,21 +24,29 @@ def get_available_tasks() -> dict[str, str]:
     return available_tasks
 
 
+def run_command(command: str) -> None:
+    print(f"\033[1m{command}\033[0m")
+    result = subprocess.run(command.split(), capture_output=True, text=True)
+    out = result.stdout
+    if out:
+        print(out)
+    err = result.stderr
+    if err:
+        print(err)
+
+
 def run_tasks(tasks: list[str]) -> None:
     available_tasks = get_available_tasks()
     for task in tasks:
-        command = available_tasks.get(task)
-        if not command:
+        commands = available_tasks.get(task)
+        if not commands:
             print(f"Error: Task '{task}' not found in pyproject.toml.")
             sys.exit(1)
-        print(f"\033[1m{command}\033[0m")
-        result = subprocess.run(command.split(), capture_output=True, text=True)
-        out = result.stdout
-        if out:
-            print(out)
-        err = result.stderr
-        if err:
-            print(err)
+        if isinstance(commands, str):
+            run_command(commands)
+        elif isinstance(commands, list):
+            for command in commands:
+                run_command(command)
 
 
 def cli() -> None:

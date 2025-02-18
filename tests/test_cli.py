@@ -3,7 +3,7 @@ import sys
 import unittest
 from unittest.mock import MagicMock, mock_open, patch
 
-from tsks.cli import get_available_tasks
+from tsks.cli import get_available_tasks, run_command
 
 
 class TestGetAvailableTasks(unittest.TestCase):
@@ -57,6 +57,32 @@ class TestGetAvailableTasks(unittest.TestCase):
         self.assertEqual(cm.exception.code, 1)
         output = self.captured_output.getvalue()
         self.assertIn("An error occurred while reading pyproject.toml.", output)
+
+
+class TestRunCommand(unittest.TestCase):
+    def setUp(self) -> None:
+        self.captured_output = io.StringIO()
+        sys.stdout = self.captured_output
+
+    def tearDown(self) -> None:
+        sys.stdout = sys.__stdout__
+
+    @patch("subprocess.run")
+    def test_run_command_success(self, mock_run: MagicMock) -> None:
+        mock_run.return_value.stdout = "Command output"
+        mock_run.return_value.stderr = ""
+        run_command("echo 'Hello, World!'")
+        output = self.captured_output.getvalue()
+        self.assertIn("Hello, World!", output)
+        self.assertIn("Command output", output)
+
+    @patch("subprocess.run")
+    def test_run_command_error(self, mock_run: MagicMock) -> None:
+        mock_run.return_value.stdout = ""
+        mock_run.return_value.stderr = "Command error"
+        run_command("invalid_command")
+        output = self.captured_output.getvalue()
+        self.assertIn("Command error", output)
 
 
 if __name__ == "__main__":

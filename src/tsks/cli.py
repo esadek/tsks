@@ -45,6 +45,6 @@ def cli() -> None:
     parser = argparse.ArgumentParser(
         prog="tsks", description="simple task runner for python projects"
     )
-    parser.add_argument("tasks", type=str, nargs="+")
+    parser.add_argument("tasks", type=str, nargs="+", help="tasks to run")
     tasks: list[str] = parser.parse_args().tasks
     run_tasks(tasks)

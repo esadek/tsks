@@ -17,9 +17,7 @@ def get_available_tasks() -> dict[str, str]:
         print(f"An error occurred while reading pyproject.toml. {e}")
         sys.exit(1)
     if not available_tasks:
-        print(
-            "Error: Tasks not found. Add tasks in pyproject.toml under [tool.tsks]."
-        )
+        print("Error: Tasks not found. Add tasks in pyproject.toml under [tool.tsks].")
         sys.exit(1)
     return available_tasks
 

@@ -49,6 +49,15 @@ class TestGetAvailableTasks(unittest.TestCase):
             output,
         )
 
+    @patch("builtins.open", side_effect=PermissionError())
+    def test_permission_error(self, mock_file: MagicMock) -> None:
+        with self.assertRaises(SystemExit) as cm:
+            get_available_tasks()
+        mock_file.assert_called()
+        self.assertEqual(cm.exception.code, 1)
+        output = self.captured_output.getvalue()
+        self.assertIn("An error occurred while reading pyproject.toml.", output)
+
 
 if __name__ == "__main__":
     unittest.main()

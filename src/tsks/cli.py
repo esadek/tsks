@@ -1,4 +1,5 @@
 import argparse
+import shlex
 import subprocess
 import sys
 import tomllib
@@ -26,7 +27,7 @@ def get_available_tasks() -> TasksDict:
 
 def run_command(command: str) -> None:
     print(f"\033[1m{command}\033[0m")
-    result = subprocess.run(command.split(), capture_output=True, text=True)
+    result = subprocess.run(shlex.split(command), capture_output=True, text=True)
     out = result.stdout
     if out:
         print(out)

@@ -1,0 +1,37 @@
+[project]
+name = "tsks"
+version = "0.1.0"
+description = "Simple task runner for Python projects."
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [
+    { name = "Emil Sadek", email = "esadek@users.noreply.github.com" }
+]
+requires-python = ">=3.13"
+dependencies = []
+
+[project.scripts]
+tsks = "tsks:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[dependency-groups]
+dev = [
+    "mypy>=1.15.0",
+    "ruff>=0.9.6",
+]
+
+[tool.mypy]
+strict = true
+
+[tool.ruff.lint]
+extend-select = ["I"]
+
+[tool.tsks]
+test = "uv run -m unittest"
+lint = "uv run ruff check --fix"
+format = "uv run ruff format"
+mypy = "uv run mypy src tests"
